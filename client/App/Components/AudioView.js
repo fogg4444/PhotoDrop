@@ -31,7 +31,6 @@ class Audio extends React.Component {
     this.state = {
       latitude: this.props.latitude,
       longitude: this.props.longitude,
-
       recordingNow: false,
       stoppedRecording: false,
       stoppedPlaying: false,
@@ -43,7 +42,6 @@ class Audio extends React.Component {
   }
 
   componentDidMount(){
-
     AudioRecorder.onProgress = (data) => {
       console.log('On audio progress-------------------');
       // TODO: parse into nice timestamp here...
@@ -93,7 +91,6 @@ class Audio extends React.Component {
     // console.log('Finish recording!');
     this.state.recordingNow = false;
     AudioRecorder.stopRecording();
-
   }
 
   _toggleRecording() {
@@ -109,8 +106,7 @@ class Audio extends React.Component {
     return (
       <View style={{ flex: 1, backgroundColor: '#ededed'}} >
         <Text style={styles.pageTitle}>Audio Extravaganza</Text>
-        
-        <View style={styles.recordBbuttonContainer}>
+          <View style={styles.recordBbuttonContainer}>
         
           <TouchableHighlight  onPress={ this._toggleRecording.bind(this) } style={styles.recButton} underlayColor={'#FC9396'}>
             <Icon name="circle" size={55} color="rgba(237,237,237,0.5)" style={styles.recIcon} />
@@ -118,7 +114,6 @@ class Audio extends React.Component {
 
           <Text style={styles.recTime}>{this.state.recordingStatusText}</Text>
           <Text style={styles.recTime}>{this.state.currentTime}</Text>
-
         </View>
       </View>
     );
