@@ -1,13 +1,8 @@
 var React = require('react-native');
-var MapView = require('react-native-maps');
 var Icon = require('react-native-vector-icons/FontAwesome');
-var CircleMarker = require('./CircleMarker');
-var PhotoView = require('./PhotoView');
-var PhotosView = require('./PhotosView');
 var api = require('../Utils/api');
-var BlackPhotoMarker = require('./BlackPhotoMarker');
-var RedPhotoMarker = require('./RedPhotoMarker');
 var IconIon = require('react-native-vector-icons/Ionicons');
+var NavigationBar = require('react-native-navbar');
 
 var {
   Navigator,
@@ -31,11 +26,12 @@ class Author extends React.Component {
       latitude: this.props.latitude,
       longitude: this.props.longitude,
     };
+    StatusBarIOS.setHidden(false);
   }
 
   componentDidMount(){
     setInterval(()=> {
-      if(this.props.params.index===1) {
+      if(this.props.params.index===3) {
         navigator.geolocation.getCurrentPosition(
           location => {
             this.setState({
@@ -48,27 +44,42 @@ class Author extends React.Component {
     }, 2000)
   }
 
-  _cancelStanza() {
-    console.log('cancelling!');
-    this.render();
+  _clearText(){
+    this.setState({text:''});
+  }
+
+  _saveText(text) {
+    api.saveStanza(this.state.text, this.state.latitude, this.state.longitude, this.props.userId, (res) => 
+    {
+      if(res) {
+        console.log('text saved');
+      }
+    });
+    this.setState({text:''});
   }
 
   render() {
-    StatusBarIOS.setHidden(true);
+    var pageTitle = (
+      <Text style={styles.pageTitle}>Stanza Bonanza</Text>
+    );
     return (
       <View style={{ flex: 1, backgroundColor: '#ededed'}}>
-        <Text style={styles.pageTitle}>Stanza Bonanza</Text>
+        <NavigationBar 
+          title={pageTitle} 
+          tintColor={"white"}
+        />
         <TextInput
+          ref={component => this._textInput = component}
           style={styles.input}
           onChangeText={(text) => this.setState({text})}
           value={this.state.text}
           multiline={true}
         />
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={_.once(this._cancelStanza.bind(this))} style={styles.noButton}>
+          <TouchableOpacity onPress={_.once(this._clearText.bind(this))} style={styles.noButton}>
             <IconIon name="ios-close-empty" size={60} color="#FC9396" style={styles.noIcon} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.yesButton}>
+          <TouchableOpacity onPress={_.once(this._saveText.bind(this))} style={styles.yesButton}>
             <IconIon name="ios-checkmark-empty" size={60} color="#036C69" style={styles.yesIcon} />
           </TouchableOpacity>
         </View>
@@ -88,7 +99,6 @@ var styles = StyleSheet.create({
     alignItems: 'center'
   },
   pageTitle: {
-    top: 10,
     fontSize: 18,
     fontFamily: 'circular',
     textAlign: 'center',
@@ -96,18 +106,19 @@ var styles = StyleSheet.create({
   },
   input: {
     height: 300, 
+    fontFamily: 'circular',
     borderColor: 'gray', 
     borderWidth: 5, 
-    borderRadius: 5,
+    borderRadius: 10,
     fontSize: 30,
-    margin: 20,
+    margin: 15,
     padding: 20,
+    backgroundColor: 'white'
   },
   buttonContainer: {
     flex: 1,
     flexDirection: 'row',
     backgroundColor: 'transparent',
-    alignItems: 'flex-end',
     justifyContent: 'center',
   },
   yesButton: {
