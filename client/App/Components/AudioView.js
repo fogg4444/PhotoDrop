@@ -25,6 +25,7 @@ class AudioView extends React.Component{
     this.state = {
       touched: false,
       favorited: false,
+      playing: false,
       uploader: undefined,
       views: undefined,
       id: this.props.id || this.props.route.id,
@@ -64,11 +65,22 @@ class AudioView extends React.Component{
     });
   }
 
+  _toggleAudioPlayback() {
+    if (this.state.playing) {
+      // stop it
+      this._stopPlay();
+    } else {
+      // start it
+      this._startPlay();
+    }
+  }
   _startPlay() {
-    // console.log()
     AudioPlayer.playWithUrl('http://localhost:8000/' + this.state.audio.filename);
-    // AudioPlayer.play('/Users/brian/Documents/hack_reactor/group_projects/PhotoDrop/server/audio/uploads/56d5ec69c0f6718a6a960b7b1457122034155.caf');
-    // AudioPlayer.play(this.state.path);
+    this.setState({playing: true});
+  }
+  _stopPlay() {
+    AudioPlayer.stop();
+    this.setState({playing: false});
   }
 
   _shareStanza() {} // needs to be here otherwise, error
@@ -87,70 +99,14 @@ class AudioView extends React.Component{
     var username = this.state.uploader ? <Text style={styles.infoText}> Uploaded by: {this.state.uploader} </Text> : null;
     var views = this.state.views ? <Text style={styles.infoText}> Views: {this.state.views} </Text> : null;
     var text = this.state.text;
-    if(this.props.togglePagination) {
-      if(this.props.showsIndex===false) {
-        return (
-          <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
-            <View style={styles.image}>
-              <View style={styles.stanzaContainer}>
-                <Text style={styles.stanzaText}>{this.state.text}</Text>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        )
-      }
-      return (
+    
+    return (
         <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
           <View style={styles.image} onPress={this._touch.bind(this)}>
-            <View style={styles.buttonContainer}>
-              <View style={styles.leftContainer}>              
-                <TouchableOpacity onPress={this._closeStanza.bind(this)} style={styles.closeButton}>
-                  <IconIon name="ios-close-empty" size={45} color="white" style={styles.closeIcon} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.rightContainer}>
-                <TouchableOpacity onPress={this._favoriteStanza.bind(this)} style={styles.favoriteButton}>
-                  {this.state.favorited ? <Icon name="heart" size={20} color="white" style={styles.favoriteIcon} /> : <Icon name="heart-o" size={20} color="white" style={styles.favoriteIcon} />}
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this._shareStanza.bind(this)} style={styles.shareButton}>
-                  <IconIon name="ios-upload-outline" size={25} color="white" style={styles.shareIcon} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.photoInfoContainer}>
-                {username}
-                {views} 
-              </View>
-            </View>
-            <View style={styles.stanzaContainer}>
-              <Text style={styles.stanzaText}>{this.state.text}</Text>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      )
-    } else {
-      if(this.state.touched===false) {
-        return (
-          <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
-            <View style={styles.image}>
 
-       
-              <View style={styles.stanzaContainer}>
 
-                <Text>THie is sijf;akjsdf</Text>
 
-                <TouchableOpacity onPress={this._startPlay.bind(this)} style={styles.favoriteButton}>
-                  {this.state.favorited ? <Icon name="heart" size={20} color="white" style={styles.favoriteIcon} /> : <Icon name="heart-o" size={20} color="white" style={styles.favoriteIcon} />}
-                </TouchableOpacity>
 
-                <Text style={styles.stanzaText}>{this.state.text}</Text>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        )
-      }
-      return (
-        <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
-          <View style={styles.image} onPress={this._touch.bind(this)}>
             <View style={styles.buttonContainer}>
               <View style={styles.leftContainer}>
 
@@ -166,23 +122,20 @@ class AudioView extends React.Component{
                   <IconIon name="ios-upload-outline" size={25} color="white" style={styles.shareIcon} />
                 </TouchableOpacity>
               </View>
-              <View style={styles.photoInfoContainer}>
-                <Text style={styles.infoText}>
-                  Uploaded by: {this.state.uploader}
-                </Text>
-                <Text style={styles.infoText}>
-                  Views: {this.state.views}
-                </Text>
-              </View>
             </View>
+
             <View style={styles.stanzaContainer}>
-              <Text style={styles.stanzaText}>{this.state.text}</Text>
+              <TouchableOpacity onPress={this._toggleAudioPlayback.bind(this)} style={styles.playButton}>
+                {this.state.playing ? 
+                  <Icon name="stop" size={35} color="white" style={styles.stopIcon} /> : 
+                  <Icon name="play" size={35} color="white" style={styles.playIcon} />}
+              </TouchableOpacity>
             </View>
+
           </View>
         </TouchableWithoutFeedback>
       )
-    }
-  }
+  }  
 }
 
 var styles = StyleSheet.create({
@@ -243,6 +196,32 @@ var styles = StyleSheet.create({
     marginTop: 15,
     marginRight: 5,
   },
+  playButton:{
+    width:100,
+    height:100,
+    backgroundColor:'rgba(0,0,0,0.3)',
+    borderRadius:50,
+    alignItems:'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+    marginTop: 15,
+    marginRight: 5,
+  },
+  playIcon:{
+    width:35,
+    height:35,
+    paddingTop: 0,
+    paddingLeft: 0,
+    marginLeft: 15
+  },
+  stopIcon:{
+    width:35,
+    height:35,
+    paddingTop: 0,
+    paddingLeft: 0,
+    marginLeft: 7.5
+  },
   closeIcon:{
     width:60,
     height:60,
@@ -261,11 +240,6 @@ var styles = StyleSheet.create({
     paddingTop: 7.5,
     paddingLeft: 7.5
   },
-  photoInfoContainer:{
-    position: 'absolute',
-    bottom: 14,
-    left: 14,
-  },
   infoText:{
     fontSize: 16,
     fontFamily: 'circular',
@@ -277,8 +251,8 @@ var styles = StyleSheet.create({
   },
   stanzaContainer:{
     position: 'absolute',
-    padding: 30,
-    top: 80
+    top: 150,
+    left: 140
   }
 });
 
