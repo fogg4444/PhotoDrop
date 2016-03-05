@@ -122,7 +122,7 @@ class AudioView extends React.Component{
     var username = this.state.uploader ? <Text style={styles.infoText}> Uploaded by: {this.state.uploader} </Text> : null;
     var views = this.state.views ? <Text style={styles.infoText}> Views: {this.state.views} </Text> : null;
     var text = this.state.text;
-    
+
     return (
         <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
           <View style={styles.image} onPress={this._touch.bind(this)}>
@@ -156,8 +156,8 @@ class AudioView extends React.Component{
 
 
               <TouchableOpacity onPress={this._toggleAudioPlayback.bind(this)} style={styles.playButton}>
-                {this.state.playing ? 
-                  <Icon name="stop" size={35} color="white" style={styles.stopIcon} /> : 
+                {this.state.playing ?
+                  <Icon name="stop" size={35} color="white" style={styles.stopIcon} /> :
                   <Icon name="play" size={35} color="white" style={styles.playIcon} />}
               </TouchableOpacity>
             </View>
@@ -165,7 +165,7 @@ class AudioView extends React.Component{
           </View>
         </TouchableWithoutFeedback>
       )
-  }  
+  }
 }
 
 var styles = StyleSheet.create({

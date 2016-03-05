@@ -42,6 +42,7 @@ module.exports = function(app, express) {
   app.get('/fetchAudios/', audioController.fetchAudios);
   app.get('/fetchAudiosLocations/', audioController.fetchAudiosLocations)
   app.get('/fetchUserAudios/', audioController.fetchUserAudios);
+  app.get('/fetchUserFavoriteAudios/', userController.fetchFavoriteAudios)
 
 
   // Increment views count on photo and add to Favorites
@@ -57,7 +58,7 @@ module.exports = function(app, express) {
   // Increment view count on Audios
   app.get('/incrementAudioViews/', audioController.incrementViews);
   // working here.......
-  // app.get('/toggleAudiosFavorite', userController.toggleAudiosFavorite);
+  app.get('/toggleAudioFavorite', userController.toggleAudioFavorite);
   app.get('/getAudiosData/', userController.getAudiosData);
 
   // Sign in and sign up routes
