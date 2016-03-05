@@ -95,7 +95,7 @@ class Map extends React.Component {
       this.state.latitudeDelta,
       this.state.longitudeDelta, (audios) => {
         console.log("audios----------------: ", audios);
-        
+
         var audiosArr = JSON.parse(audios);
         this.setState({ audiosLocations: audiosArr });
     });
@@ -114,14 +114,12 @@ class Map extends React.Component {
           });
           api.fetchPhotos(
             this.state.latitude,
-            this.state.longitude,
-            50, (photos) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
+            this.state.longitude, 50, (photos) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
               var photosArr = JSON.parse(photos);
               this.setState({ closeLocations: photosArr });
           });
           api.fetchStanzas(
-            this.props.params.
-            atitude,
+            this.props.params.latitude,
             this.props.params.longitude, 50, (stanzas) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
               var stanzasArr = JSON.parse(stanzas);
               this.setState({ closeStanzaLocations: stanzasArr });
@@ -136,8 +134,7 @@ class Map extends React.Component {
           });
           api.fetchAudios(
             this.state.latitude,
-            this.state.longitude,
-            50, (audios) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
+            this.state.longitude, 50, (audios) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
               var audiosArr = JSON.parse(audios);
               this.setState({ closeAudiosLocations: audiosArr });
           });
@@ -201,13 +198,13 @@ class Map extends React.Component {
   }
 
   showAudio(id, audio) {
-    // console.log("show audio", id, audio);    
     return () => {
       api.incrementAudioViews(id, (data) => {
         this.props.navigator.push({
           component: AudioView,
           id: id,
-          audio: audio,
+          audio: JSON.parse(audio),
+          path: JSON.parse(audio).path,
           userId: this.props.userId,
           views: JSON.parse(data).views, 
           width: this.state.currentScreenWidth,
@@ -241,14 +238,14 @@ class Map extends React.Component {
   }
 
   openAllPhotos() {
-      this.props.navigator.push({
-        component: PhotosView,
-        userId: this.props.userId,
-        sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
-        previousComponent: 'map',
-        latitude: this.state.latitude,
-        longitude: this.state.longitude
-      });
+    this.props.navigator.push({
+      component: PhotosView,
+      userId: this.props.userId,
+      sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+      previousComponent: 'map',
+      latitude: this.state.latitude,
+      longitude: this.state.longitude
+    });
   }
 
   render() {
@@ -304,7 +301,6 @@ class Map extends React.Component {
              )}
             )
           }
-
           { this.state.audiosLocations.map((audioLocation) => {
               return (
               <MapView.Marker coordinate={{latitude: audioLocation.loc.coordinates[1], longitude: audioLocation.loc.coordinates[0]}}>
