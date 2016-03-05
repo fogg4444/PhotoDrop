@@ -49,7 +49,8 @@ class AudioView extends React.Component{
   }
 
   componentDidMount() {
-    alert(this.state.audio.path)
+    // alert(this.state.audio.filename);
+
   }
 
   _closeStanza() {
@@ -64,8 +65,8 @@ class AudioView extends React.Component{
   }
 
   _startPlay() {
-    console.log("teasdasadssds")
-    AudioPlayer.playWithUrl('/Users/brian/Documents/hack_reactor/group_projects/PhotoDrop/server/audio/uploads/56d5ec69c0f6718a6a960b7b1457122034155.caf');
+    // console.log()
+    AudioPlayer.playWithUrl('http://localhost:8000/' + this.state.audio.filename);
     // AudioPlayer.play('/Users/brian/Documents/hack_reactor/group_projects/PhotoDrop/server/audio/uploads/56d5ec69c0f6718a6a960b7b1457122034155.caf');
     // AudioPlayer.play(this.state.path);
   }
@@ -131,10 +132,16 @@ class AudioView extends React.Component{
         return (
           <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
             <View style={styles.image}>
-              <TouchableHighlight  onPress={ this._startPlay.bind(this) } style={styles.recButton} underlayColor={'#FC9396'}>
-                <Icon name="play" size={55} color="rgba(237,237,237,0.5)" style={styles.recIcon} />
-              </TouchableHighlight>          
+
+       
               <View style={styles.stanzaContainer}>
+
+                <Text>THie is sijf;akjsdf</Text>
+
+                <TouchableOpacity onPress={this._startPlay.bind(this)} style={styles.favoriteButton}>
+                  {this.state.favorited ? <Icon name="heart" size={20} color="white" style={styles.favoriteIcon} /> : <Icon name="heart-o" size={20} color="white" style={styles.favoriteIcon} />}
+                </TouchableOpacity>
+
                 <Text style={styles.stanzaText}>{this.state.text}</Text>
               </View>
             </View>
