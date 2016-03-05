@@ -3,6 +3,7 @@ var NavigationBar = require('react-native-navbar');
 var Icon = require('react-native-vector-icons/FontAwesome');
 var IconIon = require('react-native-vector-icons/Ionicons');
 var api = require('../Utils/api');
+var ProgressBar = require('react-native-progress-bar');
 
 var {AudioRecorder, AudioPlayer} = require('../../custom_modules/Audio.ios.js');
 var RNFS = require('react-native-fs');
@@ -10,7 +11,7 @@ var RNFS = require('react-native-fs');
 var {
   View,
   StyleSheet,
-  Stanza,
+  Audio,
   ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -56,13 +57,13 @@ class AudioView extends React.Component{
 
   }
 
-  _closeStanza() {
+  _closeAudio() {
     this.props.navigator.pop();
     if(this.props.showStatusBar) {this.props.showStatusBar();}
   }
 
-  _favoriteStanza() {
-    api.toggleStanzaFavorite(this.state.userId, this.state.id, (result) => {
+  _favoriteAudio() {
+    api.toggleAudioFavorite(this.state.userId, this.state.id, (result) => {
       this.state.favorited ? this.setState({favorited:false}) : this.setState({favorited:true})
     });
   }
@@ -85,7 +86,7 @@ class AudioView extends React.Component{
       console.log(data);
       var currentTime = data.currentTime;
       var totalTime = data.currentDuration;
-      var statusBar = ( currentTime / totalTime ) * 100;
+      var statusBar = currentTime / totalTime;
       self.setState({
         audioProgress: statusBar
       })
@@ -93,16 +94,19 @@ class AudioView extends React.Component{
     AudioPlayer.setFinishedSubscription(function(){
       self.setState({
         playing: false,
-        audioProgress: undefined
+        audioProgress: 0
       });
     });
   }
   _stopPlay() {
     AudioPlayer.stop();
-    this.setState({playing: false});
+    this.setState({
+      playing: false,
+      audioProgress: 0
+    });
   }
 
-  _shareStanza() {} // needs to be here otherwise, error
+  _shareAudio() {} // needs to be here otherwise, error
 
   _touch() {
     if(this.state.touched===false) {
@@ -126,23 +130,29 @@ class AudioView extends React.Component{
             <View style={styles.buttonContainer}>
               <View style={styles.leftContainer}>
 
-                <TouchableOpacity onPress={this._closeStanza.bind(this)} style={styles.closeButton}>
+                <TouchableOpacity onPress={this._closeAudio.bind(this)} style={styles.closeButton}>
                   <IconIon name="ios-close-empty" size={45} color="white" style={styles.closeIcon} />
                 </TouchableOpacity>
               </View>
               <View style={styles.rightContainer}>
-                <TouchableOpacity onPress={this._favoriteStanza.bind(this)} style={styles.favoriteButton}>
+                <TouchableOpacity onPress={this._favoriteAudio.bind(this)} style={styles.favoriteButton}>
                   {this.state.favorited ? <Icon name="heart" size={20} color="white" style={styles.favoriteIcon} /> : <Icon name="heart-o" size={20} color="white" style={styles.favoriteIcon} />}
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this._shareStanza.bind(this)} style={styles.shareButton}>
+                <TouchableOpacity onPress={this._shareAudio.bind(this)} style={styles.shareButton}>
                   <IconIon name="ios-upload-outline" size={25} color="white" style={styles.shareIcon} />
                 </TouchableOpacity>
               </View>
             </View>
+            <View style={styles.progressContainer}>
+              <ProgressBar
+                fillStyle={{}}
+                backgroundStyle={{backgroundColor: '#cccccc', borderRadius: 2}}
+                style={{marginTop: 10, width: 300}}
+                progress={this.state.audioProgress}
+              />
+            </View>
 
-            <View style={styles.stanzaContainer}>
-              <Text>{this.state.audioProgress}</Text>
-
+            <View style={styles.AudioContainer}>
 
 
               <TouchableOpacity onPress={this._toggleAudioPlayback.bind(this)} style={styles.playButton}>
@@ -265,14 +275,19 @@ var styles = StyleSheet.create({
     fontFamily: 'circular',
     color: 'black'
   },
-  stanzaText:{
+  AudioText:{
     fontSize: 30,
     fontFamily: 'circular'
   },
-  stanzaContainer:{
+  AudioContainer:{
     position: 'absolute',
     top: 150,
     left: 140
+  },
+  progressContainer: {
+    position: 'absolute',
+    top: 120,
+    left: 35
   }
 });
 
