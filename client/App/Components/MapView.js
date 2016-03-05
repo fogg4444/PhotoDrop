@@ -5,6 +5,9 @@ var CircleMarker = require('./CircleMarker');
 var PhotoView = require('./PhotoView');
 var StanzaView = require('./StanzaView');
 var PhotosView = require('./PhotosView');
+
+var AudioView = require('./AudioView');
+
 var api = require('../Utils/api');
 var BlackPhotoMarker = require('./BlackPhotoMarker');
 var RedPhotoMarker = require('./RedPhotoMarker');
@@ -83,6 +86,7 @@ class Map extends React.Component {
       50, (audios) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
         var audiosArr = JSON.parse(audios);
         this.setState({ closeAudiosLocations: audiosArr });
+        console.log('Close audio locations: ', this.state.closeAudiosLocations)
     });
 
     api.fetchAudiosLocations(
@@ -90,6 +94,8 @@ class Map extends React.Component {
       this.state.longitude,
       this.state.latitudeDelta,
       this.state.longitudeDelta, (audios) => {
+        console.log("audios----------------: ", audios);
+        
         var audiosArr = JSON.parse(audios);
         this.setState({ audiosLocations: audiosArr });
     });
@@ -195,6 +201,7 @@ class Map extends React.Component {
   }
 
   showAudio(id, audio) {
+    // console.log("show audio", id, audio);    
     return () => {
       api.incrementAudioViews(id, (data) => {
         this.props.navigator.push({
@@ -308,7 +315,7 @@ class Map extends React.Component {
           }
           { this.state.closeAudiosLocations.map((audioLocation) => {
               return (
-               <MapView.Marker coordinate={{latitude: audioLocation.loc.coordinates[1], longitude: audioLocation.loc.coordinates[0]}} onPress={this.showAudio(audioLocation._id, audioLocation.text)}>
+               <MapView.Marker coordinate={{latitude: audioLocation.loc.coordinates[1], longitude: audioLocation.loc.coordinates[0]}} onPress={this.showAudio(audioLocation._id, audioLocation.audio)}>
                  <RedAudioMarker navigator={this.props.navigator}/>
                </MapView.Marker>
              )}
