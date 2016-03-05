@@ -224,19 +224,19 @@ module.exports = {
         console.log(err);
       }
       if (audio) {
-        User.findOne({ _id: mongoose.mongo.ObjectID(stanza.userId) }, function(err, user) {
+        User.findOne({ _id: mongoose.mongo.ObjectID(audio.userId) }, function(err, user) {
           if (err) {
             next(err);
           }
           if (!user) {
-            console.error('User was not found --- getStanzaData');
+            console.error('User was not found --- getAudioData');
           } else {
             User.findOne({ _id: mongoose.mongo.ObjectID(currentUserId) }, function(err, user) {
               if (err) {
                 next(err);
               }
               if (!user) {
-                console.error('User was not found --- getStanzaData 2');
+                console.error('User was not found --- getAudioData 2');
               } else {
                 var favorited = (user.audioFavorites.indexOf(req.query.id) === -1);
                 res.json({ username: user.username, views: audio.views, favorited: !favorited });
