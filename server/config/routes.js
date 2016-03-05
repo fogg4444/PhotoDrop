@@ -58,7 +58,7 @@ module.exports = function(app, express) {
   app.get('/incrementAudioViews/', audioController.incrementViews);
   // working here.......
   // app.get('/toggleAudiosFavorite', userController.toggleAudiosFavorite);
-  // app.get('/getAudiosData/', userController.getAudiosData);
+  app.get('/getAudiosData/', userController.getAudiosData);
 
   // Sign in and sign up routes
   app.post('/login', userController.login);

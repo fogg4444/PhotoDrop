@@ -217,6 +217,37 @@ module.exports = {
     });
   },
 
+  getAudiosData: function(req, res, next) {
+    var currentUserId = req.query.userId;
+    Audio.findOne({ _id: mongoose.mongo.ObjectID(req.query.id) }, function(err, audio) {
+      if (err) {
+        console.log(err);
+      }
+      if (audio) {
+        User.findOne({ _id: mongoose.mongo.ObjectID(audio.userId) }, function(err, user) {
+          if (err) {
+            next(err);
+          }
+          if (!user) {
+            console.error('User was not found --- getAudioData');
+          } else {
+            User.findOne({ _id: mongoose.mongo.ObjectID(currentUserId) }, function(err, user) {
+              if (err) {
+                next(err);
+              }
+              if (!user) {
+                console.error('User was not found --- getAudioData 2');
+              } else {
+                var favorited = (user.audioFavorites.indexOf(req.query.id) === -1);
+                res.json({ username: user.username, views: audio.views, favorited: !favorited });
+              }
+            });
+          }
+        });
+      }
+    });
+  },
+
   fetchFavorites: function(req, res, next) {
     User.findOne({ _id: mongoose.mongo.ObjectID(req.query.userId) }, function(err, user) {
       if (err) {
