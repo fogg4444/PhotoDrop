@@ -45,6 +45,10 @@ class PhotosView extends React.Component{
       userStanzas: undefined,
       userFavoriteStanzas: undefined,
       allViewableStanzas: undefined,
+      audios: undefined,
+      userAudios: undefined,
+      userFavoriteAudios: undefined,
+      AllViewableAudios: undefined,
       isRefreshing: false,
     };
     if(this.state.favorites) {
@@ -69,6 +73,15 @@ class PhotosView extends React.Component{
         this.setState({ stanzas: stanzasArr });
         this.setState({ userStanzas: stanzasArr });
       })
+      api.fetchUserFavoriteAudios(this.state.userId, (audios) => {
+        var audiosArr = JSON.parse(audios);
+        this.setState({ userFavoriteAudios: audiosArr });
+      })
+      api.fetchUserAudios(this.state.userId, (audios) => {
+        var audiosArr = JSON.parse(audios);
+        this.setState({ audios: audiosArr });
+        this.setState({ userAudios: audiosArr });
+      })
     } else {
       navigator.geolocation.getCurrentPosition(
         location => {
@@ -89,6 +102,10 @@ class PhotosView extends React.Component{
         var stanzasArr = JSON.parse(stanzas);
         this.setState({ stanzas: stanzasArr });
       })
+      api.fetchAudios(this.state.latitude, this.state.longitude, 50, (audios) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
+        var audiosArr = JSON.parse(audios);
+        this.setState({ audios: audiosArr });
+      })
     }
   }
 
@@ -96,9 +113,11 @@ class PhotosView extends React.Component{
     if(this.state.favorites){
       this.setState({ imageUrls: this.state.userPhotosUrls});
       this.setState({ stanzas: this.state.userStanzas});
+      this.setState({ audios: this.state.userAudios});
     } else {
       this.setState({ imageUrls: this.state.allViewablePhotos});
       this.setState({ stanzas: this.state.allViewableStanzas});
+      this.setState({ audios: this.state.allViewableAudios});
     }
   }
 
@@ -166,6 +185,30 @@ class PhotosView extends React.Component{
     }
   }
 
+  showAudioFullscreen(audio, index) {
+    // return () => {
+    //   this.setState({statusBarHidden: true});
+    //   this.props.navigator.push({
+    //     component: AudioSwiperView,
+    //     index: index,
+    //     audios: this.state.audios,
+    //     // uri: uri,
+    //     // width: this.state.currentScreenWidth,
+    //     showStatusBar: this.showStatusBar.bind(this),
+    //     userId: this.state.userId,
+    //     sceneConfig: {
+    //       ...Navigator.SceneConfigs.FloatFromBottom,
+    //       gestures: {
+    //         pop: {
+    //           ...Navigator.SceneConfigs.FloatFromBottom.gestures.pop,
+    //           edgeHitWidth: Dimensions.get('window').height,
+    //         },
+    //       },
+    //     }
+    //   });
+    // }
+  }
+
   showStatusBar() {
     this.setState({statusBarHidden: false});
   }
@@ -192,6 +235,17 @@ class PhotosView extends React.Component{
     })
   }
 
+  renderAudioRow(audios) {
+    return audios.map((audio, index) => {
+      return (
+        // Hardcoded key value for each element below to dismiss eror message
+        <TouchableHighlight onPress={this.showStanzaFullscreen(stanza, index)}>
+          <Text style={[styles.stanza, this.calculatedSize()]}>AudioID: {audio.id}</Text>
+        </TouchableHighlight>
+      )
+    })
+  }
+
   _backButton() {
     this.props.navigator.pop();
   }
@@ -203,9 +257,11 @@ class PhotosView extends React.Component{
     if(event.nativeEvent.selectedSegmentIndex===0) {
         this.setState({ imageUrls: this.state.userPhotosUrls});
         this.setState({ stanzas: this.state.userStanzas});
+        this.setState({ audios: this.state.userAudios});
     } else if(event.nativeEvent.selectedSegmentIndex===1) {
         this.setState({ imageUrls: this.state.userFavoritesUrls});
         this.setState({ stanzas: this.state.userFavoriteStanzas});
+        this.setState({ audios: this.state.userFavoriteAudios});
     }
   }
 
@@ -220,6 +276,10 @@ class PhotosView extends React.Component{
         var stanzaArr = JSON.parse(stanzas);
         this.setState({ userFavoriteStanzas: stanzaArr });
       })
+      api.fetchUserFavoriteAudios(this.state.userId, (audios) => {
+        var audioArr = JSON.parse(audios);
+        this.setState({ userFavoriteAudios: audioArr });
+      })
       api.fetchUserPhotos(this.state.userId, (photos) => {
         var photosArr = JSON.parse(photos);
         var photosUrls = photosArr.map((photo) => {
@@ -231,12 +291,18 @@ class PhotosView extends React.Component{
         var stanzaArr = JSON.parse(stanzas);
         this.setState({ userStanzas: stanzaArr });
       })
+      api.fetchUserAudios(this.state.userId, (audios) => {
+        var audioArr = JSON.parse(audios);
+        this.setState({ userAudios: audioArr });
+      })
       if(this.state.selectedIndex===0) {
         this.setState({imageUrls: this.state.userPhotosUrls});
         this.setState({stanzas: this.state.userStanzas});
+        this.setState({audios: this.state.userAudios});
       } else if(this.state.selectedIndex===1) {
         this.setState({imageUrls: this.state.userFavoritesUrls});
         this.setState({stanzas: this.state.userFavoriteStanzas});
+        this.setState({audios: this.state.userFavoriteAudios});
       }
     } else {
       navigator.geolocation.getCurrentPosition(
@@ -257,6 +323,10 @@ class PhotosView extends React.Component{
       api.fetchStanzas(this.state.latitude, this.state.longitude, 50, (stanzas) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
         var stanzaArr = JSON.parse(stanzas);
         this.setState({ stanzas: stanzaArr });
+      })
+      api.fetchAudios(this.state.latitude, this.state.longitude, 50, (audios) => { // need to pass in the radius (in m) from the MapView; hardcoding as 50m for now
+        var audioArr = JSON.parse(audios);
+        this.setState({ audios: audioArr });
       })
     }
     setTimeout(() => {
@@ -316,6 +386,14 @@ class PhotosView extends React.Component{
                 {this.state.stanzas ? this.renderStanzaRow(this.state.stanzas) : null}
               </ScrollView>
             </View>
+
+            <View>
+              <Text style={styles.mediaTitle}>Audio</Text>
+              <ScrollView horizontal={true}>
+                {this.state.audios ? this.renderAudioRow(this.state.audios) : null}
+              </ScrollView>
+            </View>
+
           </ScrollView>
 
         </View>
@@ -345,6 +423,13 @@ class PhotosView extends React.Component{
               <Text style={styles.mediaTitle}>Stanzas</Text>
               <ScrollView horizontal={true}>
                 {this.state.stanzas ? this.renderStanzaRow(this.state.stanzas) : null}
+              </ScrollView>
+            </View>
+
+            <View>
+              <Text style={styles.mediaTitle}>Audio</Text>
+              <ScrollView horizontal={true}>
+                {this.state.audios ? this.renderAudioRow(this.state.audios) : null}
               </ScrollView>
             </View>
 
