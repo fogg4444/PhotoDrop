@@ -238,8 +238,9 @@ class PhotosView extends React.Component{
   }
 
   _startPlay(filename) {
-    console.log("IM THE AUDIOIOI", filename);
-    AudioPlayer.playWithUrl('http://localhost:8000/' + filename);
+    return () => {
+      AudioPlayer.playWithUrl('http://localhost:8000/' + filename);
+    }
   }
 
   renderAudioRow(audios) {
