@@ -3,20 +3,22 @@ var NavigationBar = require('react-native-navbar');
 var Icon = require('react-native-vector-icons/FontAwesome');
 var IconIon = require('react-native-vector-icons/Ionicons');
 var api = require('../Utils/api');
+var ProgressBar = require('react-native-progress-bar');
 
-var {AudioRecorder, AudioPlayer} = require('react-native-audio');
+var {AudioRecorder, AudioPlayer} = require('../../custom_modules/Audio.ios.js');
 var RNFS = require('react-native-fs');
 
 var {
   View,
   StyleSheet,
-  Stanza,
+  Audio,
   ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
   ActionSheetIOS,
   Text,
   StatusBarIOS,
+  ActivityIndicatorIOS
 } = React;
 
 class AudioView extends React.Component{
@@ -25,6 +27,8 @@ class AudioView extends React.Component{
     this.state = {
       touched: false,
       favorited: false,
+      playing: false,
+      audioProgress: 0,
       uploader: undefined,
       views: undefined,
       id: this.props.id || this.props.route.id,
@@ -53,25 +57,56 @@ class AudioView extends React.Component{
 
   }
 
-  _closeStanza() {
+  _closeAudio() {
     this.props.navigator.pop();
     if(this.props.showStatusBar) {this.props.showStatusBar();}
   }
 
-  _favoriteStanza() {
-    api.toggleStanzaFavorite(this.state.userId, this.state.id, (result) => {
+  _favoriteAudio() {
+    api.toggleAudioFavorite(this.state.userId, this.state.id, (result) => {
       this.state.favorited ? this.setState({favorited:false}) : this.setState({favorited:true})
     });
   }
 
+  _toggleAudioPlayback() {
+    if (this.state.playing) {
+      // stop it
+      this._stopPlay();
+    } else {
+      // start it
+      this._startPlay();
+    }
+  }
   _startPlay() {
-    // console.log()
     AudioPlayer.playWithUrl('http://localhost:8000/' + this.state.audio.filename);
-    // AudioPlayer.play('/Users/brian/Documents/hack_reactor/group_projects/PhotoDrop/server/audio/uploads/56d5ec69c0f6718a6a960b7b1457122034155.caf');
-    // AudioPlayer.play(this.state.path);
+    this.setState({playing: true});
+    var self = this;
+
+    AudioPlayer.setProgressSubscription(function(data){
+      console.log(data);
+      var currentTime = data.currentTime;
+      var totalTime = data.currentDuration;
+      var statusBar = currentTime / totalTime;
+      self.setState({
+        audioProgress: statusBar
+      })
+    });
+    AudioPlayer.setFinishedSubscription(function(){
+      self.setState({
+        playing: false,
+        audioProgress: 0
+      });
+    });
+  }
+  _stopPlay() {
+    AudioPlayer.stop();
+    this.setState({
+      playing: false,
+      audioProgress: 0
+    });
   }
 
-  _shareStanza() {} // needs to be here otherwise, error
+  _shareAudio() {} // needs to be here otherwise, error
 
   _touch() {
     if(this.state.touched===false) {
@@ -87,102 +122,50 @@ class AudioView extends React.Component{
     var username = this.state.uploader ? <Text style={styles.infoText}> Uploaded by: {this.state.uploader} </Text> : null;
     var views = this.state.views ? <Text style={styles.infoText}> Views: {this.state.views} </Text> : null;
     var text = this.state.text;
-    if(this.props.togglePagination) {
-      if(this.props.showsIndex===false) {
-        return (
-          <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
-            <View style={styles.image}>
-              <View style={styles.stanzaContainer}>
-                <Text style={styles.stanzaText}>{this.state.text}</Text>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        )
-      }
-      return (
+    
+    return (
         <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
           <View style={styles.image} onPress={this._touch.bind(this)}>
-            <View style={styles.buttonContainer}>
-              <View style={styles.leftContainer}>              
-                <TouchableOpacity onPress={this._closeStanza.bind(this)} style={styles.closeButton}>
-                  <IconIon name="ios-close-empty" size={45} color="white" style={styles.closeIcon} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.rightContainer}>
-                <TouchableOpacity onPress={this._favoriteStanza.bind(this)} style={styles.favoriteButton}>
-                  {this.state.favorited ? <Icon name="heart" size={20} color="white" style={styles.favoriteIcon} /> : <Icon name="heart-o" size={20} color="white" style={styles.favoriteIcon} />}
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this._shareStanza.bind(this)} style={styles.shareButton}>
-                  <IconIon name="ios-upload-outline" size={25} color="white" style={styles.shareIcon} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.photoInfoContainer}>
-                {username}
-                {views} 
-              </View>
-            </View>
-            <View style={styles.stanzaContainer}>
-              <Text style={styles.stanzaText}>{this.state.text}</Text>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      )
-    } else {
-      if(this.state.touched===false) {
-        return (
-          <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
-            <View style={styles.image}>
 
-       
-              <View style={styles.stanzaContainer}>
-
-                <Text>THie is sijf;akjsdf</Text>
-
-                <TouchableOpacity onPress={this._startPlay.bind(this)} style={styles.favoriteButton}>
-                  {this.state.favorited ? <Icon name="heart" size={20} color="white" style={styles.favoriteIcon} /> : <Icon name="heart-o" size={20} color="white" style={styles.favoriteIcon} />}
-                </TouchableOpacity>
-
-                <Text style={styles.stanzaText}>{this.state.text}</Text>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        )
-      }
-      return (
-        <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
-          <View style={styles.image} onPress={this._touch.bind(this)}>
             <View style={styles.buttonContainer}>
               <View style={styles.leftContainer}>
 
-                <TouchableOpacity onPress={this._closeStanza.bind(this)} style={styles.closeButton}>
+                <TouchableOpacity onPress={this._closeAudio.bind(this)} style={styles.closeButton}>
                   <IconIon name="ios-close-empty" size={45} color="white" style={styles.closeIcon} />
                 </TouchableOpacity>
               </View>
               <View style={styles.rightContainer}>
-                <TouchableOpacity onPress={this._favoriteStanza.bind(this)} style={styles.favoriteButton}>
+                <TouchableOpacity onPress={this._favoriteAudio.bind(this)} style={styles.favoriteButton}>
                   {this.state.favorited ? <Icon name="heart" size={20} color="white" style={styles.favoriteIcon} /> : <Icon name="heart-o" size={20} color="white" style={styles.favoriteIcon} />}
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this._shareStanza.bind(this)} style={styles.shareButton}>
+                <TouchableOpacity onPress={this._shareAudio.bind(this)} style={styles.shareButton}>
                   <IconIon name="ios-upload-outline" size={25} color="white" style={styles.shareIcon} />
                 </TouchableOpacity>
               </View>
-              <View style={styles.photoInfoContainer}>
-                <Text style={styles.infoText}>
-                  Uploaded by: {this.state.uploader}
-                </Text>
-                <Text style={styles.infoText}>
-                  Views: {this.state.views}
-                </Text>
-              </View>
             </View>
-            <View style={styles.stanzaContainer}>
-              <Text style={styles.stanzaText}>{this.state.text}</Text>
+            <View style={styles.progressContainer}>
+              <ProgressBar
+                fillStyle={{}}
+                backgroundStyle={{backgroundColor: '#cccccc', borderRadius: 2}}
+                style={{marginTop: 10, width: 300}}
+                progress={this.state.audioProgress}
+              />
             </View>
+
+            <View style={styles.AudioContainer}>
+
+
+              <TouchableOpacity onPress={this._toggleAudioPlayback.bind(this)} style={styles.playButton}>
+                {this.state.playing ? 
+                  <Icon name="stop" size={35} color="white" style={styles.stopIcon} /> : 
+                  <Icon name="play" size={35} color="white" style={styles.playIcon} />}
+              </TouchableOpacity>
+            </View>
+
           </View>
         </TouchableWithoutFeedback>
       )
-    }
-  }
+  }  
 }
 
 var styles = StyleSheet.create({
@@ -243,6 +226,32 @@ var styles = StyleSheet.create({
     marginTop: 15,
     marginRight: 5,
   },
+  playButton:{
+    width:100,
+    height:100,
+    backgroundColor:'rgba(0,0,0,0.3)',
+    borderRadius:50,
+    alignItems:'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+    marginTop: 15,
+    marginRight: 5,
+  },
+  playIcon:{
+    width:35,
+    height:35,
+    paddingTop: 0,
+    paddingLeft: 0,
+    marginLeft: 15
+  },
+  stopIcon:{
+    width:35,
+    height:35,
+    paddingTop: 0,
+    paddingLeft: 0,
+    marginLeft: 7.5
+  },
   closeIcon:{
     width:60,
     height:60,
@@ -261,24 +270,24 @@ var styles = StyleSheet.create({
     paddingTop: 7.5,
     paddingLeft: 7.5
   },
-  photoInfoContainer:{
-    position: 'absolute',
-    bottom: 14,
-    left: 14,
-  },
   infoText:{
     fontSize: 16,
     fontFamily: 'circular',
     color: 'black'
   },
-  stanzaText:{
+  AudioText:{
     fontSize: 30,
     fontFamily: 'circular'
   },
-  stanzaContainer:{
+  AudioContainer:{
     position: 'absolute',
-    padding: 30,
-    top: 80
+    top: 150,
+    left: 140
+  },
+  progressContainer: {
+    position: 'absolute',
+    top: 120,
+    left: 35
   }
 });
 
