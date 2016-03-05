@@ -228,6 +228,7 @@ class PhotosView extends React.Component{
 
   renderStanzaRow(stanzas) {
     return stanzas.map((stanza, index) => {
+        console.log('TRYNA RENDER A STANZA ROW!');
       return (
         // Hardcoded key value for each element below to dismiss eror message
         <TouchableHighlight onPress={this.showStanzaFullscreen(stanza, index)}>
@@ -379,10 +380,10 @@ class PhotosView extends React.Component{
             <View>
               <Text style={styles.mediaTitle}>Photos</Text>
               {this.state.imageUrls ? null : <ActivityIndicatorIOS size={'large'} style={[styles.centering, {height: 550}]} />}
-              {this.state.imageUrls && this.state.selectedIndex===0 && !this.state.imageUrls.length ? <Text style={styles.noPhotosText}>{`Looks like you haven't taken any photos...`}</Text>   : null}
+              {this.state.imageUrls && this.state.selectedIndex===0 && !this.state.imageUrls.length ? <Text style={styles.noPhotosText}>Looks like you haven't taken any photos...</Text>   : null}
               {this.state.imageUrls && this.state.selectedIndex===0 && !this.state.imageUrls.length ? <Text style={styles.noPhotosText2}>Swipe to the camera and drop a photo!</Text>  : null}
               {this.state.imageUrls && this.state.selectedIndex===1 && !this.state.imageUrls.length ? <Text style={styles.noPhotosText}>Looks like you have no favorite photos...</Text>   : null}
-              {this.state.imageUrls && this.state.selectedIndex===1 && !this.state.imageUrls.length ? <Text style={styles.noPhotosText2}>Swipe to the map and checkout photos around you!</Text>  : null}
+              {this.state.imageUrls && this.state.selectedIndex===1 && !this.state.imageUrls.length ? <Text style={styles.noPhotosText2}>Swipe to the map and checkout media around you!</Text>  : null}
               <ScrollView horizontal={true}>
                 {this.state.imageUrls ? this.renderRow(this.state.imageUrls) : null}
               </ScrollView>
@@ -390,6 +391,11 @@ class PhotosView extends React.Component{
 
             <View>
               <Text style={styles.mediaTitle}>Stanzas</Text>
+              {this.state.stanzas ? null : <ActivityIndicatorIOS size={'large'} style={[styles.centering, {height: 550}]} />}
+              {this.state.stanzas && this.state.selectedIndex===0 && !this.state.stanzas.length ? <Text style={styles.noPhotosText}>Looks like you haven't written any stanzas...</Text>   : null}
+              {this.state.stanzas && this.state.selectedIndex===0 && !this.state.stanzas.length ? <Text style={styles.noPhotosText2}>Swipe to the text input and drop a verse!</Text>  : null}
+              {this.state.stanzas && this.state.selectedIndex===1 && !this.state.stanzas.length ? <Text style={styles.noPhotosText}>Looks like you have no favorite stanzas...</Text>   : null}
+              {this.state.stanzas && this.state.selectedIndex===1 && !this.state.stanzas.length ? <Text style={styles.noPhotosText2}>Swipe to the map and checkout media around you!</Text>  : null}
               <ScrollView horizontal={true}>
                 {this.state.stanzas ? this.renderStanzaRow(this.state.stanzas) : null}
               </ScrollView>
@@ -397,6 +403,11 @@ class PhotosView extends React.Component{
 
             <View>
               <Text style={styles.mediaTitle}>Audio</Text>
+              {this.state.audios ? null : <ActivityIndicatorIOS size={'large'} style={[styles.centering, {height: 550}]} />}
+              {this.state.audios && this.state.selectedIndex===0 && !this.state.audios.length ? <Text style={styles.noPhotosText}>Looks like you haven't recorded anything...</Text>   : null}
+              {this.state.audios && this.state.selectedIndex===0 && !this.state.audios.length ? <Text style={styles.noPhotosText2}>Swipe to the mic and record something!</Text>  : null}
+              {this.state.audios && this.state.selectedIndex===1 && !this.state.audios.length ? <Text style={styles.noPhotosText}>Looks like you have no favorite audio clips...</Text>   : null}
+              {this.state.audios && this.state.selectedIndex===1 && !this.state.audios.length ? <Text style={styles.noPhotosText2}>Swipe to the map and checkout media around you!</Text>  : null}
               <ScrollView horizontal={true}>
                 {this.state.audios ? this.renderAudioRow(this.state.audios) : null}
               </ScrollView>
@@ -429,6 +440,9 @@ class PhotosView extends React.Component{
 
             <View>
               <Text style={styles.mediaTitle}>Stanzas</Text>
+              {this.state.stanzas ? null : <ActivityIndicatorIOS size={'large'} style={[styles.centering, {height: 550}]} />}
+              {this.state.stanzas && this.state.selectedIndex===0 && !this.state.stanzas.length ? <Text style={styles.noPhotosText}>Looks like there are no stanzas near you...</Text>   : null}
+              {this.state.stanzas && this.state.selectedIndex===0 && !this.state.stanzas.length ? <Text style={styles.noPhotosText2}>Be the first one to drop a verse!</Text>  : null}
               <ScrollView horizontal={true}>
                 {this.state.stanzas ? this.renderStanzaRow(this.state.stanzas) : null}
               </ScrollView>
@@ -436,6 +450,9 @@ class PhotosView extends React.Component{
 
             <View>
               <Text style={styles.mediaTitle}>Audio</Text>
+              {this.state.audios ? null : <ActivityIndicatorIOS size={'large'} style={[styles.centering, {height: 550}]} />}
+              {this.state.audios && this.state.selectedIndex===0 && !this.state.audios.length ? <Text style={styles.noPhotosText}>Looks like there's no audio near you...</Text>   : null}
+              {this.state.audios && this.state.selectedIndex===0 && !this.state.audios.length ? <Text style={styles.noPhotosText2}>Be the first one to record something!</Text>  : null}
               <ScrollView horizontal={true}>
                 {this.state.audios ? this.renderAudioRow(this.state.audios) : null}
               </ScrollView>
