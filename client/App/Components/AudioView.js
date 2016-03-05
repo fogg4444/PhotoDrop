@@ -4,7 +4,7 @@ var Icon = require('react-native-vector-icons/FontAwesome');
 var IconIon = require('react-native-vector-icons/Ionicons');
 var api = require('../Utils/api');
 
-var {AudioRecorder, AudioPlayer} = require('react-native-audio');
+var {AudioRecorder, AudioPlayer} = require('../../custom_modules/Audio.ios.js');
 var RNFS = require('react-native-fs');
 
 var {
@@ -17,6 +17,7 @@ var {
   ActionSheetIOS,
   Text,
   StatusBarIOS,
+  ActivityIndicatorIOS
 } = React;
 
 class AudioView extends React.Component{
@@ -26,6 +27,7 @@ class AudioView extends React.Component{
       touched: false,
       favorited: false,
       playing: false,
+      audioProgress: 0,
       uploader: undefined,
       views: undefined,
       id: this.props.id || this.props.route.id,
@@ -77,6 +79,23 @@ class AudioView extends React.Component{
   _startPlay() {
     AudioPlayer.playWithUrl('http://localhost:8000/' + this.state.audio.filename);
     this.setState({playing: true});
+    var self = this;
+
+    AudioPlayer.setProgressSubscription(function(data){
+      console.log(data);
+      var currentTime = data.currentTime;
+      var totalTime = data.currentDuration;
+      var statusBar = ( currentTime / totalTime ) * 100;
+      self.setState({
+        audioProgress: statusBar
+      })
+    });
+    AudioPlayer.setFinishedSubscription(function(){
+      self.setState({
+        playing: false,
+        audioProgress: undefined
+      });
+    });
   }
   _stopPlay() {
     AudioPlayer.stop();
@@ -104,9 +123,6 @@ class AudioView extends React.Component{
         <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
           <View style={styles.image} onPress={this._touch.bind(this)}>
 
-
-
-
             <View style={styles.buttonContainer}>
               <View style={styles.leftContainer}>
 
@@ -125,6 +141,10 @@ class AudioView extends React.Component{
             </View>
 
             <View style={styles.stanzaContainer}>
+              <Text>{this.state.audioProgress}</Text>
+
+
+
               <TouchableOpacity onPress={this._toggleAudioPlayback.bind(this)} style={styles.playButton}>
                 {this.state.playing ? 
                   <Icon name="stop" size={35} color="white" style={styles.stopIcon} /> : 
