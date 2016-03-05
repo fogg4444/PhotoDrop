@@ -65,10 +65,7 @@ class AudioView extends React.Component{
   }
 
   _startPlay() {
-    // console.log()
     AudioPlayer.playWithUrl('http://localhost:8000/' + this.state.audio.filename);
-    // AudioPlayer.play('/Users/brian/Documents/hack_reactor/group_projects/PhotoDrop/server/audio/uploads/56d5ec69c0f6718a6a960b7b1457122034155.caf');
-    // AudioPlayer.play(this.state.path);
   }
 
   _shareStanza() {} // needs to be here otherwise, error
@@ -103,7 +100,7 @@ class AudioView extends React.Component{
         <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
           <View style={styles.image} onPress={this._touch.bind(this)}>
             <View style={styles.buttonContainer}>
-              <View style={styles.leftContainer}>              
+              <View style={styles.leftContainer}>
                 <TouchableOpacity onPress={this._closeStanza.bind(this)} style={styles.closeButton}>
                   <IconIon name="ios-close-empty" size={45} color="white" style={styles.closeIcon} />
                 </TouchableOpacity>
@@ -118,7 +115,7 @@ class AudioView extends React.Component{
               </View>
               <View style={styles.photoInfoContainer}>
                 {username}
-                {views} 
+                {views}
               </View>
             </View>
             <View style={styles.stanzaContainer}>
@@ -133,7 +130,7 @@ class AudioView extends React.Component{
           <TouchableWithoutFeedback onPress={this._touch.bind(this)} style={styles.imageContainer}>
             <View style={styles.image}>
 
-       
+
               <View style={styles.stanzaContainer}>
 
                 <Text>THie is sijf;akjsdf</Text>

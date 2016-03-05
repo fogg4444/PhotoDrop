@@ -5,6 +5,8 @@ var api = require('../Utils/api');
 var IconIon = require('react-native-vector-icons/Ionicons');
 var PhotoSwiperView = require('./PhotoSwiperView');
 var StanzaSwiperView = require('./StanzaSwiperView');
+var {AudioRecorder, AudioPlayer} = require('react-native-audio');
+
 
 var {
   Navigator,
@@ -235,12 +237,17 @@ class PhotosView extends React.Component{
     })
   }
 
+  _startPlay(filename) {
+    console.log("IM THE AUDIOIOI", filename);
+    AudioPlayer.playWithUrl('http://localhost:8000/' + filename);
+  }
+
   renderAudioRow(audios) {
     return audios.map((audio, index) => {
       return (
         // Hardcoded key value for each element below to dismiss eror message
-        <TouchableHighlight onPress={this.showStanzaFullscreen(stanza, index)}>
-          <Text style={[styles.stanza, this.calculatedSize()]}>AudioID: {audio.id}</Text>
+        <TouchableHighlight onPress={this._startPlay(JSON.parse(audio.audio).filename)}>
+          <Text style={[styles.stanza, this.calculatedSize()]}>AudioID: {audio._id}</Text>
         </TouchableHighlight>
       )
     })
